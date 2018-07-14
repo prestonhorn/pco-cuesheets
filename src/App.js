@@ -32,10 +32,10 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      accountId: process.env.PCO_ACCOUNT_ID || null,
-      planId: process.env.PCO_PLAN_ID || null,
-      appId: process.env.PCO_APP_ID || null,
-      appSecret: process.env.PCO_APP_SECRET || null,
+      accountId: process.env.REACT_APP_PCO_ACCOUNT_ID || null,
+      planId: process.env.REACT_APP_PCO_PLAN_ID || null,
+      appId: process.env.REACT_APP_PCO_APP_ID || null,
+      appSecret: process.env.REACT_APP_PCO_APP_SECRET || null,
       plan: null,
       times: null,
       items: null,
@@ -89,12 +89,15 @@ class App extends Component {
         notes: notesResponse.data,
         people: peopleResponse.data
       });
+      if (this.state.plan && this.state.notes && this.state.people) {
+        this._setInfo();
+      }
       if (this.state.times) {
-        this._setTimes(this.state.times);
+        this._setTimes();
       }
       if (this.state.items) {
-        this._setItemNotes(this.state.items);
-        this._setItems(this.state.items);
+        this._setItemNotes();
+        this._setItems();
       }
     })).catch((error) => {
       this.setState({ error: error.message });
@@ -102,7 +105,8 @@ class App extends Component {
     });
   }
 
-  _setInfo = (plan, notes, people) => {
+  _setInfo = () => {
+    const { plan, notes, people } = this.state;
     const speaker = notes.data.filter(note => note.attributes.category_name === 'Speaker')[0].attributes.content;
     const producer = people.data.filter(person => person.attributes.team_position_name === 'Producer')[0].attributes.name;
     this.setState({
@@ -114,7 +118,8 @@ class App extends Component {
     });
   }
 
-  _setTimes = (times) => {
+  _setTimes = () => {
+    const { times } = this.state;
     let timesArr = [];
     times.data.map(time => {
       if (time.attributes.time_type === 'service') {
@@ -126,7 +131,8 @@ class App extends Component {
   }
 
   // Iterate and set ITEMS NOTES
-  _setItemNotes = (items) => {
+  _setItemNotes = () => {
+    const { items } = this.state;
     let itemNotes = {};
     items.included.map(note => {
       itemNotes[note.id] = {
@@ -140,8 +146,8 @@ class App extends Component {
   }
 
   // Iterate and set ITEMS DATA
-  _setItems = (items) => {
-    const { itemNotes, timesArr } = this.state;
+  _setItems = () => {
+    const { items, itemNotes, timesArr } = this.state;
     let songCount = 0;
     let prevLength = 0;
 
