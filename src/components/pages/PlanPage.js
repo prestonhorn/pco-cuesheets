@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { connect } from 'react-redux';
 import axios from 'axios';
 import moment from 'moment';
 
@@ -28,14 +29,11 @@ const Item = props => {
   );
 }
 
-class App extends Component {
+export class PlanPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      accountId: process.env.REACT_APP_PCO_ACCOUNT_ID || null,
-      planId: process.env.REACT_APP_PCO_PLAN_ID || null,
-      appId: process.env.REACT_APP_PCO_APP_ID || null,
-      appSecret: process.env.REACT_APP_PCO_APP_SECRET || null,
+      planId: this.props.match ? this.props.match.params.planid : null,
       plan: null,
       times: null,
       items: null,
@@ -54,9 +52,15 @@ class App extends Component {
     this._getPlan = this._getPlan.bind(this);
   }
 
+  componentWillMount() {
+    if (!this.state.planId) this.props.history.push('/');
+  }
+
   componentDidMount() {
-    const { accountId, planId, appId, appSecret } = this.state;
-    if (accountId && planId && appId && appSecret) {
+    const { appId, appSecret, baseUrl } = this.props;
+    const { planId } = this.state;
+    document.title = `${document.title} - ${planId}`;
+    if (appId && appSecret && baseUrl && planId) {
       this._getPlan();
     } else {
       this.setState({ error: 'Missing credentials' });
@@ -64,26 +68,41 @@ class App extends Component {
   }
 
   _getPlan = () => {
-    const { accountId, planId, appId: username, appSecret: password } = this.state;
-    const baseUrl = 'https://api.planningcenteronline.com/services/v2/service_types/';
+    const { appId, appSecret, baseUrl } = this.props;
+    const { planId } = this.state;
+    const auth = { auth: { username: appId, password: appSecret } };
+    const planUrl = baseUrl + '/plans/' + planId;
 
-    const auth = { auth: { username, password } };
-    const planUrl = baseUrl + accountId + '/plans/' + planId;
+    axios.get(planUrl, auth).then(response => {
+      this.setState({
+        plan: response.data,
+        serviceTypeId: response.data.data.relationships.service_type.data.id
+      });
+      this.state.plan && this._getData();
+    }).catch((error) => {
+      this.setState({ error: error.message });
+      console.log(error);
+    });
+  }
+
+  _getData = () => {
+    const { appId, appSecret, baseUrl } = this.props;
+    const { serviceTypeId, planId } = this.state;
+    const auth = { auth: { username: appId, password: appSecret } };
+    const planUrl = baseUrl + '/service_types/' + serviceTypeId + '/plans/' + planId;
     const timesUrl = planUrl + '/plan_times';
     const itemsUrl = planUrl + '/items?per_page=100&include=item_notes';
     const notesUrl = planUrl + '/notes';
     const peopleUrl = planUrl + '/team_members';
     axios.all(
       [
-        axios.get(planUrl, auth),
         axios.get(timesUrl, auth),
         axios.get(itemsUrl, auth),
         axios.get(notesUrl, auth),
         axios.get(peopleUrl, auth)
       ]
-    ).then(axios.spread((planResponse, timesResponse, itemsResponse, notesResponse, peopleResponse) => {
+    ).then(axios.spread((timesResponse, itemsResponse, notesResponse, peopleResponse) => {
       this.setState({
-        plan: planResponse.data,
         times: timesResponse.data,
         items: itemsResponse.data,
         notes: notesResponse.data,
@@ -107,14 +126,14 @@ class App extends Component {
 
   _setInfo = () => {
     const { plan, notes, people } = this.state;
-    const speaker = notes.data.filter(note => note.attributes.category_name === 'Speaker')[0].attributes.content;
-    const producer = people.data.filter(person => person.attributes.team_position_name === 'Producer')[0].attributes.name;
+    const speaker = notes.data.filter(note => note.attributes && note.attributes.category_name === 'Speaker');
+    const producer = people.data.filter(person => person.attributes && person.attributes.team_position_name === 'Producer');
     this.setState({
       date: plan.data.attributes.dates,
       seriesTitle: plan.data.attributes.series_title,
       title: plan.data.attributes.title,
-      speaker,
-      producer
+      speaker: speaker.length > 0 && speaker[0].attributes.content,
+      producer: producer.length > 0 && producer[0].attributes.name
     });
   }
 
@@ -222,7 +241,12 @@ class App extends Component {
   }
 
   render() {
-    return this.state.error ? <h1>{this.state.error}</h1> : this.renderPlan();
+    return (
+      <div>
+        {this.state.error && <h1>{this.state.error}</h1>}
+        {this.state.itemsArr && this.renderPlan()}
+      </div>
+    );
   }
 
   renderPlan() {
@@ -283,4 +307,15 @@ class App extends Component {
   }
 }
 
-export default App;
+const mapStateToProps = (state) => ({
+  appId: state.appId,
+  appSecret: state.appSecret,
+  baseUrl: state.baseUrl
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  // setTypes: data => dispatch(setTypes(data)),
+  // setPlans: data => dispatch(setPlans(data))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(PlanPage);
