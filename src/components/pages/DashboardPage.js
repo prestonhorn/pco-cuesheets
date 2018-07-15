@@ -4,13 +4,15 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 import { setTypes, setPlans } from '../../actions/rootActions'
+import Spinner from '../Spinner';
 
 
 export class DashboardPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      error: null
+      error: null,
+      loading: false
     };
     this._getData = this._getData.bind(this);
   }
@@ -28,7 +30,8 @@ export class DashboardPage extends React.Component {
     const { appId, appSecret, baseUrl, planTypes } = this.props;
     const auth = { auth: { username: appId, password: appSecret } };
     const typeCalls = planTypes.map(type => axios.get(baseUrl + '/service_types/' + type, auth));
-    const plansCalls = planTypes.map(type => axios.get(baseUrl + '/service_types/' + type + '/plans', auth));
+    const plansCalls = planTypes.map(type => axios.get(baseUrl + '/service_types/' + type + '/plans?filter=future', auth));
+    this.setState({ loading: true });
     axios.all(
       [...typeCalls, ...plansCalls]
     ).then(response => {
@@ -41,15 +44,16 @@ export class DashboardPage extends React.Component {
       });
       this.props.setTypes(typesData);
       this.props.setPlans(plansData);
+      this.setState({ loading: false });
     }).catch((error) => {
-      this.setState({ error: error.message });
+      this.setState({ error: error.message, loading: false });
     });
   }
 
   render() {
     return (
       <div style={{ margin: '20px' }}>
-        <h1>Choose a plan:</h1>
+        <h1>{this.state.loading && <Spinner />} Choose a plan:</h1>
         {this.state.error && <pre>{this.state.error}</pre>}
         {this.renderList()}
       </div>

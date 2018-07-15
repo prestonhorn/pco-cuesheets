@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import moment from 'moment';
 
+import Spinner from '../Spinner';
+
 
 const Header = props => {
   return (
@@ -244,20 +246,20 @@ export class PlanPage extends React.Component {
     return (
       <div>
         {this.state.error && <h1>{this.state.error}</h1>}
-        {this.state.itemsArr && this.renderPlan()}
+        {this.state.itemsArr ? this.renderPlan() : <Spinner width="30px" height="30px" margin="5px" />}
       </div>
     );
   }
 
   renderPlan() {
-    const { date, seriesTitle, title, speaker, producer, itemsArr } = this.state;
+    const { serviceTypeId, date, seriesTitle, title, speaker, producer, itemsArr } = this.state;
     return (
       <div>
         <table id="header" style={{ display: 'block' }}>
           <tbody>
             <tr>
               <td className="left">
-                <img src="lcprintlogo.png" alt="" className="logo" />
+                <img src={`/logo_${serviceTypeId}.png`} alt="" className="logo" />
               </td>
               <td className="date">{date}</td>
               <td colSpan="2" className="right" align="right">
@@ -313,9 +315,4 @@ const mapStateToProps = (state) => ({
   baseUrl: state.baseUrl
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  // setTypes: data => dispatch(setTypes(data)),
-  // setPlans: data => dispatch(setPlans(data))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(PlanPage);
+export default connect(mapStateToProps)(PlanPage);

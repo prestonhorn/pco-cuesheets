@@ -12,7 +12,8 @@ const defaultState = {
   planTypes: planTypes ? planTypes.split(',') : null,
   error: null,
   typesData: null,
-  plansData: null
+  plansData: null,
+  plans: {}
 };
 
 export default (state = defaultState, action) => {
@@ -27,6 +28,8 @@ export default (state = defaultState, action) => {
         ...state,
         plansData: action.data
       };
+    case 'SET_STORE':
+      return state;
     default:
       return state;
   }
