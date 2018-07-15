@@ -28,7 +28,7 @@ export class DashboardPage extends React.Component {
     const { appId, appSecret, baseUrl, planTypes } = this.props;
     const auth = { auth: { username: appId, password: appSecret } };
     const typeCalls = planTypes.map(type => axios.get(baseUrl + '/service_types/' + type, auth));
-    const plansCalls = planTypes.map(type => axios.get(baseUrl + '/service_types/' + type + '/plans?filter=future', auth));
+    const plansCalls = planTypes.map(type => axios.get(baseUrl + '/service_types/' + type + '/plans', auth));
     axios.all(
       [...typeCalls, ...plansCalls]
     ).then(response => {
