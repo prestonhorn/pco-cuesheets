@@ -3,7 +3,7 @@ const defaultState = {
   serviceTypes: null,
   typesData: null,
   plansData: null,
-  error: nul,
+  error: null
 };
 
 export default (state = defaultState, action) => {

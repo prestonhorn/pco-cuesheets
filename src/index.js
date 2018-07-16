@@ -23,6 +23,6 @@ ReactDOM.render(app, document.getElementById('root'));
 registerServiceWorker();
 
 /*
-1) Rehydrate store
+1) Remove appId and appSecret deletes
 2) Refactor PlanPage
 */
