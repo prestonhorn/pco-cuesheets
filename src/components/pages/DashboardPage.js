@@ -68,7 +68,7 @@ export class DashboardPage extends React.Component {
             <h3 key={index}>{type.name}</h3>
             <ul key={type.id}>
               {this.props.plansData && this.props.plansData[index].map((plan, plan_index) => (
-                <li key={plan_index} style={{ marginLeft: '20px' }}><Link key={plan_index} to={`/${plan.id}`}>{plan.attributes.dates} - {plan.attributes.series_title} {plan.attributes.title}</Link> ({plan.id})</li>
+                <li key={plan_index} style={{ marginLeft: '20px' }}><Link key={plan_index} to={`/${type.id}/${plan.id}`}>{plan.attributes.dates} - {plan.attributes.series_title} {plan.attributes.title}</Link> ({plan.id})</li>
               ))}
             </ul>
           </div>

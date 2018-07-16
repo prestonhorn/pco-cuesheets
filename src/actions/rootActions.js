@@ -11,9 +11,3 @@ export const setPlans = (data) => {
     data
   }
 };
-
-export const setStore = () => {
-  return {
-    type: 'SET_STORE'
-  }
-};

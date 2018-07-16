@@ -6,16 +6,11 @@ import createHistory from 'history/createBrowserHistory';
 import DashboardPage from './pages/DashboardPage';
 import PlanPage from './pages/PlanPage';
 import NotFoundPage from './pages/NotFoundPage';
-import { setStore } from '../actions/rootActions';
 
 
 export const history = createHistory();
 
 class AppRouter extends React.Component {
-  componentWillMount() {
-    if (!this.propsappId || !this.propsappSecret || !this.propsbaseUrl) this.props.setStore();
-  }
-
   render() {
     return (
       <div>
@@ -23,7 +18,7 @@ class AppRouter extends React.Component {
           <div>
             <Switch>
               <Route path="/" component={DashboardPage} exact={true} />
-              <Route path="/:planid" component={PlanPage} />
+              <Route path="/:typeId/:planId" component={PlanPage} />
               <Route component={NotFoundPage} />
             </Switch>
           </div>
@@ -39,8 +34,4 @@ const mapStateToProps = (state) => ({
   baseUrl: state.baseUrl
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  setStore: () => dispatch(setStore())
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(AppRouter);
+export default connect(mapStateToProps)(AppRouter);

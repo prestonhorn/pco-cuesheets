@@ -35,7 +35,8 @@ export class PlanPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      planId: this.props.match ? this.props.match.params.planid : null,
+      typeId: this.props.match ? this.props.match.params.typeId : null,
+      planId: this.props.match ? this.props.match.params.planId : null,
       plan: null,
       times: null,
       items: null,
@@ -51,7 +52,7 @@ export class PlanPage extends React.Component {
       producer: null,
       error: null
     };
-    this._getPlan = this._getPlan.bind(this);
+    this._getData = this._getData.bind(this);
   }
 
   componentWillMount() {
@@ -63,48 +64,50 @@ export class PlanPage extends React.Component {
     const { planId } = this.state;
     document.title = `${document.title} - ${planId}`;
     if (appId && appSecret && baseUrl && planId) {
-      this._getPlan();
+      this._getData();
     } else {
       this.setState({ error: 'Missing credentials' });
     }
   }
 
-  _getPlan = () => {
-    const { appId, appSecret, baseUrl } = this.props;
-    const { planId } = this.state;
-    const auth = { auth: { username: appId, password: appSecret } };
-    const planUrl = baseUrl + '/plans/' + planId;
+  // _getPlan = () => {
+  //   const { appId, appSecret, baseUrl } = this.props;
+  //   const { planId } = this.state;
+  //   const auth = { auth: { username: appId, password: appSecret } };
+  //   const planUrl = baseUrl + 'service_types/plans/' + planId;
 
-    axios.get(planUrl, auth).then(response => {
-      this.setState({
-        plan: response.data,
-        serviceTypeId: response.data.data.relationships.service_type.data.id
-      });
-      this.state.plan && this._getData();
-    }).catch((error) => {
-      this.setState({ error: error.message });
-      console.log(error);
-    });
-  }
+  //   axios.get(planUrl, auth).then(response => {
+  //     this.setState({
+  //       plan: response.data,
+  //       serviceTypeId: response.data.data.relationships.service_type.data.id
+  //     });
+  //     this.state.plan && this._getData();
+  //   }).catch((error) => {
+  //     this.setState({ error: error.message });
+  //     console.log(error);
+  //   });
+  // }
 
   _getData = () => {
     const { appId, appSecret, baseUrl } = this.props;
-    const { serviceTypeId, planId } = this.state;
+    const { typeId, planId } = this.state;
     const auth = { auth: { username: appId, password: appSecret } };
-    const planUrl = baseUrl + '/service_types/' + serviceTypeId + '/plans/' + planId;
+    const planUrl = baseUrl + '/service_types/' + typeId + '/plans/' + planId;
     const timesUrl = planUrl + '/plan_times';
     const itemsUrl = planUrl + '/items?per_page=100&include=item_notes';
     const notesUrl = planUrl + '/notes';
     const peopleUrl = planUrl + '/team_members';
     axios.all(
       [
+        axios.get(planUrl, auth),
         axios.get(timesUrl, auth),
         axios.get(itemsUrl, auth),
         axios.get(notesUrl, auth),
         axios.get(peopleUrl, auth)
       ]
-    ).then(axios.spread((timesResponse, itemsResponse, notesResponse, peopleResponse) => {
+    ).then(axios.spread((planResponse, timesResponse, itemsResponse, notesResponse, peopleResponse) => {
       this.setState({
+        plan: planResponse.data,
         times: timesResponse.data,
         items: itemsResponse.data,
         notes: notesResponse.data,
@@ -252,14 +255,14 @@ export class PlanPage extends React.Component {
   }
 
   renderPlan() {
-    const { serviceTypeId, date, seriesTitle, title, speaker, producer, itemsArr } = this.state;
+    const { typeId, date, seriesTitle, title, speaker, producer, itemsArr } = this.state;
     return (
       <div>
         <table id="header" style={{ display: 'block' }}>
           <tbody>
             <tr>
               <td className="left">
-                <img src={`/logo_${serviceTypeId}.png`} alt="" className="logo" />
+                <img src={`/logo_${typeId}.png`} alt="" className="logo" />
               </td>
               <td className="date">{date}</td>
               <td colSpan="2" className="right" align="right">

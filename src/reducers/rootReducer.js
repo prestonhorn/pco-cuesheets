@@ -28,8 +28,6 @@ export default (state = defaultState, action) => {
         ...state,
         plansData: action.data
       };
-    case 'SET_STORE':
-      return state;
     default:
       return state;
   }
