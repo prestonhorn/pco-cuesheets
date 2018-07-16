@@ -35,6 +35,8 @@ export class PlanPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      appId: process.env.REACT_APP_PCO_APP_ID || null,
+      appSecret: process.env.REACT_APP_PCO_APP_SECRET || null,
       typeId: this.props.match ? this.props.match.params.typeId : null,
       planId: this.props.match ? this.props.match.params.planId : null,
       plan: null,
@@ -60,8 +62,8 @@ export class PlanPage extends React.Component {
   }
 
   componentDidMount() {
-    const { appId, appSecret, baseUrl } = this.props;
-    const { planId } = this.state;
+    const { baseUrl } = this.props;
+    const { appId, appSecret, planId } = this.state;
     document.title = `${document.title} - ${planId}`;
     if (appId && appSecret && baseUrl && planId) {
       this._getData();
@@ -89,8 +91,8 @@ export class PlanPage extends React.Component {
   // }
 
   _getData = () => {
-    const { appId, appSecret, baseUrl } = this.props;
-    const { typeId, planId } = this.state;
+    const { baseUrl } = this.props;
+    const { appId, appSecret, typeId, planId } = this.state;
     const auth = { auth: { username: appId, password: appSecret } };
     const planUrl = baseUrl + '/service_types/' + typeId + '/plans/' + planId;
     const timesUrl = planUrl + '/plan_times';
@@ -313,8 +315,6 @@ export class PlanPage extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-  appId: state.appId,
-  appSecret: state.appSecret,
   baseUrl: state.baseUrl
 });
 

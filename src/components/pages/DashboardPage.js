@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
-import { setTypes, setPlans } from '../../actions/rootActions'
+import { setTypes, setPlans } from '../../actions/rootActions';
 import Spinner from '../Spinner';
 
 
@@ -11,6 +11,8 @@ export class DashboardPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      appId: process.env.REACT_APP_PCO_APP_ID || null,
+      appSecret: process.env.REACT_APP_PCO_APP_SECRET || null,
       error: null,
       loading: false
     };
@@ -18,7 +20,8 @@ export class DashboardPage extends React.Component {
   }
 
   componentDidMount() {
-    const { appId, appSecret, baseUrl, serviceTypes } = this.props;
+    const { baseUrl, serviceTypes } = this.props;
+    const { appId, appSecret } = this.state;
     if (appId && appSecret && baseUrl && serviceTypes) {
       this._getData();
     } else {
@@ -27,7 +30,8 @@ export class DashboardPage extends React.Component {
   }
 
   _getData = () => {
-    const { appId, appSecret, baseUrl, serviceTypes } = this.props;
+    const { baseUrl, serviceTypes } = this.props;
+    const { appId, appSecret } = this.state;
     const auth = { auth: { username: appId, password: appSecret } };
     const typeCalls = serviceTypes.map(type => axios.get(baseUrl + '/service_types/' + type, auth));
     const plansCalls = serviceTypes.map(type => axios.get(baseUrl + '/service_types/' + type + '/plans?filter=future', auth));
@@ -79,8 +83,6 @@ export class DashboardPage extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-  appId: state.appId,
-  appSecret: state.appSecret,
   baseUrl: state.baseUrl,
   serviceTypes: state.serviceTypes,
   typesData: state.typesData,

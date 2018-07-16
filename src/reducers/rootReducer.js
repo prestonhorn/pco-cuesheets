@@ -1,23 +1,19 @@
-const {
-  REACT_APP_PCO_APP_ID: appId,
-  REACT_APP_PCO_APP_SECRET: appSecret,
-  REACT_APP_PCO_BASE_URL: baseUrl,
-  REACT_APP_PCO_SERVICE_TYPES: serviceTypes
-} = process.env;
-
 const defaultState = {
-  appId: appId || null,
-  appSecret: appSecret || null,
-  baseUrl: baseUrl || null,
-  serviceTypes: serviceTypes ? serviceTypes.split(',') : null,
-  error: null,
+  baseUrl: null,
+  serviceTypes: null,
   typesData: null,
   plansData: null,
-  plans: {}
+  error: nul,
 };
 
 export default (state = defaultState, action) => {
   switch (action.type) {
+    case 'SET_ENV_VARS':
+      return {
+        ...state,
+        baseUrl: action.data.baseUrl,
+        serviceTypes: action.data.serviceTypes
+      };
     case 'SET_TYPES':
       return {
         ...state,
