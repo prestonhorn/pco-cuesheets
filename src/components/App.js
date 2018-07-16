@@ -1,11 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Router, Route, Switch } from 'react-router-dom';
+import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import createHistory from 'history/createBrowserHistory';
 
 import DashboardPage from './pages/DashboardPage';
 import PlanPage from './pages/PlanPage';
-import NotFoundPage from './pages/NotFoundPage';
 
 
 export const history = createHistory();
@@ -17,9 +16,9 @@ class AppRouter extends React.Component {
         <Router history={history} >
           <div>
             <Switch>
-              <Route path="/" component={DashboardPage} exact={true} />
+              <Route path ="/" component={DashboardPage} exact={true} />
               <Route path="/:typeId/:planId" component={PlanPage} />
-              <Route component={NotFoundPage} />
+              <Redirect from="*" to="/" />
             </Switch>
           </div>
         </Router>
