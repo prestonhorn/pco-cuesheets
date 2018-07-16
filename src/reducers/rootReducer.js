@@ -2,14 +2,14 @@ const {
   REACT_APP_PCO_APP_ID: appId,
   REACT_APP_PCO_APP_SECRET: appSecret,
   REACT_APP_PCO_BASE_URL: baseUrl,
-  REACT_APP_PCO_PLAN_TYPES: planTypes
+  REACT_APP_PCO_SERVICE_TYPES: serviceTypes
 } = process.env;
 
 const defaultState = {
   appId: appId || null,
   appSecret: appSecret || null,
   baseUrl: baseUrl || null,
-  planTypes: planTypes ? planTypes.split(',') : null,
+  serviceTypes: serviceTypes ? serviceTypes.split(',') : null,
   error: null,
   typesData: null,
   plansData: null,

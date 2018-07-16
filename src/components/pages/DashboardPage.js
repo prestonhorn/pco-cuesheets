@@ -18,8 +18,8 @@ export class DashboardPage extends React.Component {
   }
 
   componentDidMount() {
-    const { appId, appSecret, baseUrl, planTypes } = this.props;
-    if (appId && appSecret && baseUrl && planTypes) {
+    const { appId, appSecret, baseUrl, serviceTypes } = this.props;
+    if (appId && appSecret && baseUrl && serviceTypes) {
       this._getData();
     } else {
       this.setState({ error: 'Missing credentials' });
@@ -27,10 +27,10 @@ export class DashboardPage extends React.Component {
   }
 
   _getData = () => {
-    const { appId, appSecret, baseUrl, planTypes } = this.props;
+    const { appId, appSecret, baseUrl, serviceTypes } = this.props;
     const auth = { auth: { username: appId, password: appSecret } };
-    const typeCalls = planTypes.map(type => axios.get(baseUrl + '/service_types/' + type, auth));
-    const plansCalls = planTypes.map(type => axios.get(baseUrl + '/service_types/' + type + '/plans?filter=future', auth));
+    const typeCalls = serviceTypes.map(type => axios.get(baseUrl + '/service_types/' + type, auth));
+    const plansCalls = serviceTypes.map(type => axios.get(baseUrl + '/service_types/' + type + '/plans?filter=future', auth));
     this.setState({ loading: true });
     axios.all(
       [...typeCalls, ...plansCalls]
@@ -82,7 +82,7 @@ const mapStateToProps = (state) => ({
   appId: state.appId,
   appSecret: state.appSecret,
   baseUrl: state.baseUrl,
-  planTypes: state.planTypes,
+  serviceTypes: state.serviceTypes,
   typesData: state.typesData,
   plansData: state.plansData
 });
